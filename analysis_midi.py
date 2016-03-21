@@ -30,8 +30,8 @@ rnd_gen = random.choice(genres)
 rnd_idx = np.random.randint(0, len(gen_trk_dict[rnd_gen]))
 
 fullpath = gen_trk_dict[rnd_gen][rnd_idx]
-fullpath = ('/Users/rafaelvalle/Desktop/research/specs/data/midi/'
-            'Rock - Metal/311 - Down.mid')
+fullpath = ('/Users/rafaelvalle/Desktop/research/music_pattern_graphs/'
+            'data/midi/Rock - Metal/311 - Down.mid')
 print fullpath
 
 # extract and plot chromagram from random file
@@ -63,7 +63,6 @@ chroma_unichr_str = ''.join(chroma_unichr)
 patt_graph = PatternGraph()
 patt_graph.addInitialState(chroma_unichr_str[0])
 
-print('mining patterns')
 # instantiate regular expressions and respective connectors
 patt_symbs = {'unt': 'T', 'sur': 'S', 'fol': 'F'}
 conns = ('|', '|', '|', '|', '|', '')
@@ -85,7 +84,6 @@ for x, y in itertools.combinations(chroma_alphabet, 2):
 # add last symbol as ending state
 patt_graph.addEndingState(chroma_unichr[-1])
 
-print('plotting pattern graph')
 # parameters for plotting and saving pattern graph
 name = 'test'
 feature = 'chroma'
