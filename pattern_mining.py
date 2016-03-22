@@ -9,9 +9,9 @@ def set_trace():
 
 # valid patterns
 re_dict = {}
-re_dict['fol'] = lambda symbs: u"({x}{y})".format(x=symbs[0], y=symbs[1])
-re_dict['sur'] = lambda symbs: u"({x}{y}{x})".format(x=symbs[0], y=symbs[1])
-re_dict['unt'] = lambda symbs: u"({x}{x}+{y})".format(x=symbs[0], y=symbs[1])
+re_dict['fol'] = lambda symbs: ur"({x}{y})".format(x=symbs[0], y=symbs[1])
+re_dict['sur'] = lambda symbs: ur"({x}{y}{x})".format(x=symbs[0], y=symbs[1])
+re_dict['unt'] = lambda symbs: ur"({x}{x}+{y})".format(x=symbs[0], y=symbs[1])
 
 
 def minePatterns(patts, conns, word):
