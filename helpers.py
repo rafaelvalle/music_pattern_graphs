@@ -1,6 +1,8 @@
 import os
 import csv
+from re import escape
 from fractions import Fraction
+from collections import defaultdict
 import numpy as np
 from sklearn.metrics.pairwise import manhattan_distances as manhat_dist
 from sklearn.metrics.pairwise import euclidean_distances as euclid_dist
@@ -103,6 +105,35 @@ def decodeChromagram(chromagram, as_str=False):
         return chroma
 
     return np.array([chroma_str2chroma(i) for i in chroma]).T
+
+
+def buildHistogram(seq, escape_chars=''):
+    """Given some sequence, escape special characters a build a histogram in the
+    form of a dictionary
+
+    Parameters
+    ----------
+    seq : list
+        List on which to compute histogram
+    escape_chars: list or string
+        Characters to be escaped with re.escape
+
+    Returns
+    -------
+    histogram : dict
+        Dictionary where keys are unique values in sequence, escaped if req. by
+        user, and values are key counts.
+    """
+
+
+    def incrementDict(a_dict, key):
+        a_dict[key] += 1
+
+    histogram = defaultdict(Zero)
+    [incrementDict(histogram, char) if char not in escape_chars else
+     incrementDict(histogram, escape(char)) for char in seq]
+
+    return histogram
 
 
 #######################
