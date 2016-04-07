@@ -4,6 +4,12 @@ import glob
 from params import data_folder, missing_key_csv, broken_csv
 from helpers import getImmediateSubdirectories, writeCSV
 
+
+def set_trace():
+    from IPython.core.debugger import Pdb
+    import sys
+    Pdb(color_scheme='Linux').set_trace(sys._getframe().f_back)
+
 genres = getImmediateSubdirectories(data_folder)
 
 gen_trk_dict = {}
