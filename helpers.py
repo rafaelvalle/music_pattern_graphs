@@ -4,6 +4,7 @@ from re import escape
 from fractions import Fraction
 from collections import defaultdict
 import numpy as np
+from scipy.sparse.linalg import svds
 from sklearn.metrics.pairwise import manhattan_distances as manhat_dist
 from sklearn.metrics.pairwise import euclidean_distances as euclid_dist
 from sklearn.metrics.pairwise import chi2_kernel as chi2_dist
@@ -83,12 +84,12 @@ def encodeChromagram(chromagram):
 
 
 def decodeChromagram(chromagram, as_str=False):
-    """Decodes an list of int encoded chromagram to binary chromagram"
+    """Decodes an list of unichr encoded chromagram to binary chromagram"
 
     Parameters
     ----------
-    chromaint : int list
-        List of chromagrams encoded as int using the encodeChromagram method
+    chromagram: unicode list
+        List of chromagrams encoded as unichr using the encodeChromagram method
     is_unichar : bool
         Is chromagram encoded as unichar
     as_str : boolean
@@ -104,7 +105,7 @@ def decodeChromagram(chromagram, as_str=False):
     if as_str:
         return chroma
 
-    return np.array([chroma_str2chroma(i) for i in chroma]).T
+    return np.array([chroma_str2chroma(i) for i in chroma])
 
 
 def buildHistogram(seq, escape_chars=''):
@@ -155,6 +156,25 @@ def getImmediateSubdirectories(folder_path):
 ###########
 #  MUSIC  #
 ###########
+def cropEdges(seq, condition=lambda x: np.sum(x) == 0):
+    start_i = 0
+    end_i = len(seq) - 1
+
+    for i in range(0, len(seq)):
+        if condition(seq[i]):
+            start_i = i
+        else:
+            break
+
+    for i in xrange(len(seq)-1, start_i, -1):
+        if condition(seq[i]):
+            end_i = i
+        else:
+            break
+
+    return seq[start_i:end_i]
+
+
 def getDistanceFromKey(key_num, key=0):
     if key_num > 11:
         return key - ((key_num + 3) % 12)
@@ -196,6 +216,23 @@ def getPhraseStarts(vals, window=4):
         results[i] = abs(vals[:, i].mean() - vals[:, i:i+window].mean()) > \
                          vals[:, i:window].std() and not results[i-1]
     return results
+
+def reduceDimensionality(data, n_singv=0, threshold=0.9):
+    if n_singv > 0:
+        lsv, sv, rsv = svds(data, n_singv, which='LM')
+    else:
+        lsv, sv, rsv = svds(data, data.shape[1] - 1, which='LM')
+        # find number of singular values that explain 90% of variance
+        n_singv = 1
+        while np.sum(sv[-n_singv:]) / np.sum(sv) < threshold:
+            n_singv += 1
+
+    # compute reduced data and data projected onto principal components space
+    data_redu = np.dot(data, rsv.T)
+    data_proj = np.dot(lsv[:,-n_singv:],
+                       np.dot(np.diag(sv[-n_singv:]), rsv[-n_singv:,]))
+
+    return data_redu, data_proj
 
 
 ##########
